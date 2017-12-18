@@ -1,0 +1,92 @@
+var isMobile = window.outerWidth < 767;
+var lang = document.documentElement.lang;
+var traducciones = {
+	'es-ES': {
+		'opiniones_clientes': 'Opiniones Clientes',
+		'texto_cookie': 'Este sitio hace uso de cookies para ofrecer todas sus funcionalidades. Si sigues navegando, aceptarás el uso de cookies - <a href="/privacy-policy-cookie-restriction-mode" id="hb-cc-ll">Saber más</a> - <a href="#" id="hb-cc-hide">Ocultar este mensaje</a>',
+		'ver_producto': 'Ver producto',
+	},
+	'en-GB': {
+		'opiniones_clientes': 'Customer opinions',
+		'texto_cookie': 'This website requires cookies to provide all of its features. By using our website, you agree to our use of cookies - <a href="/privacy-policy-cookie-restriction-mode" id="hb-cc-ll">Learn more</a> - <a href="#" id="hb-cc-hide">Hide this message</a>',
+		'ver_producto': 'See product',
+	},
+	'de-DE': {
+		'opiniones_clientes': 'Kundenmeinungen',
+		'texto_cookie': 'Diese Website erfordert Cookies, um alle ihre Funktionen bereitzustellen. Durch die Nutzung unserer Website stimmen Sie der Verwendung von Cookies zu - <a href="/privacy-policy-cookie-restriction-mode" id="hb-cc-ll">Mehr erfahren</a> - <a href="#" id="hb-cc-hide">Verberge diese Nachricht</a>',
+		'ver_producto': 'Siehe Produkt',
+	},
+	'fr-FR': {
+		'opiniones_clientes': 'Avis des clients',
+		'texto_cookie': 'Ce site nécessite des cookies pour fournir toutes ses fonctionnalités. En utilisant notre site Web, vous acceptez notre utilisation des cookies - <a href="/privacy-policy-cookie-restriction-mode" id="hb-cc-ll">Apprendre encore plus</a> - <a href="#" id="hb-cc-hide">Cache ce message</a>',
+		'ver_producto': 'Voir le produit',
+	},
+	'it-IT': {
+		'opiniones_clientes': 'Opinioni dei clienti',
+		'texto_cookie': 'Questo sito Web richiede i cookie per fornire tutte le sue funzionalità. Utilizzando il nostro sito Web, accetti il nostro utilizzo dei cookie - <a href="/privacy-policy-cookie-restriction-mode" id="hb-cc-ll">Per saperne di più</a> - <a href="#" id="hb-cc-hide">Nascondi questo messaggio</a>',
+		'ver_producto': 'Vedere',
+	},
+	'lt-LT': {
+		'opiniones_clientes': 'Customer opinions',
+		'texto_cookie': 'This website requires cookies to provide all of its features. By using our website, you agree to our use of cookies - <a href="/privacy-policy-cookie-restriction-mode" id="hb-cc-ll">Learn more</a> - <a href="#" id="hb-cc-hide">Hide this message</a>',
+		'ver_producto': 'See product',
+	}
+};
+
+jQuery(function() {
+	if (isMobile) {
+		// Movemos la caja de condiciones justo después de la ficha de producto
+		jQuery('.product-info-main').prepend(jQuery('.cajaCondicionesProducto'));
+		jQuery('.cajaCondicionesProducto').addClass('loaded');
+		jQuery('#mc_embed_signup .button').val('');
+		jQuery('#mc_embed_signup input.email').attr('placeholder','Email');
+
+		// Si hay opiniones ponemos el enlace
+		setTimeout(function() {
+			if(!jQuery('#ts_product_widget').find('.productreviewsSummary').is(':empty')) {
+				jQuery('.page-title-wrapper.product').append('<a href="#trustedshops-productreviews-sticker-wrapper" class="opiniones">'+traducciones[lang]['opiniones_clientes']+'</a>');
+				setTimeout(function() {
+					jQuery('.opiniones').addClass('show_opiniones');
+				},1000);
+			}
+		},4000);
+		// Añadimos el botón Ver Producto en la ficha de Producto para los productos relacionados
+		
+		jQuery('.catalog-product-view .products-upsell .product-item').each(function(index, element) {
+			var url = jQuery(element).find('.product-item-link').attr('href');
+			var html = '<a class="link-to-product" href="'+url+'">'+traducciones[lang]['ver_producto']+'</a>';
+			jQuery(element).find('.price-box').append(html);
+		});
+		
+		// Colocamos los botones para mejorar el layout de la info de productos
+		jQuery('.product-item-info').each(function(index,element) {
+			jQuery(element).find('.price-box.price-final_price').append(jQuery(element).find('.product-item-inner'));
+		});
+
+		// Fix del Widget de las estrellas
+		
+		/*var widget = jQuery('#tsbadgeResponsiveTop_db8d3657bdbe440c985ae127463eaad4');
+		if(widget.length>0) {
+			jQuery('.columns .column.main').append(widget);
+		}*/
+	}
+});
+
+// Modificación para las cookies
+requirejs(['jquery','jquery.cookie'],function(jQuery){
+    (function($) {
+    	// Cambiamos el texto
+    	$('#hb-cc-wrap span').html(traducciones[lang]['texto_cookie']);
+        // Show cookie bar
+        if ($.cookie('hellobrave_cookiecompliance') != "true") {
+            $('#hb-cc-wrap').addClass('show_cookie');
+        } 
+        // Handle hide button
+        $('#hb-cc-hide').click(function(event) {
+            event.preventDefault();
+            $('#hb-cc-wrap').removeClass('show_cookie');
+            // SET COOKIE
+            $.cookie('hellobrave_cookiecompliance', "true", { expires: 28, path: '/' });
+        });
+    })(jQuery);
+});

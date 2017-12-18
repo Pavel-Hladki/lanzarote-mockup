@@ -1,0 +1,197 @@
+// Datalayer
+jQuery(function() {
+
+	// datalayer que captura cuando hacemos click en un producto
+	jQuery('.product-item-element').click(function(event) {
+		//event.preventDefault();
+		
+		var id 			= jQuery(this).attr('data-id');
+		var name 		= jQuery(this).attr('data-name');
+		var href 		= jQuery(this).attr('href');
+		var price 		= jQuery(this).attr('data-price');
+		var brand 		= jQuery(this).attr('data-brand');
+		var category 	= jQuery(this).attr('data-category');
+		var list 		= jQuery(this).attr('data-list');
+		var quantity    = jQuery(this).attr('data-quantity');
+		
+		console.log("[product-item-element] id: " + id + " -- name: " + name + " -- price: " + price + " -- href: " + href 
+			                                + " -- brand: " + brand + " -- category: " + category + " -- quantity: " + quantity);
+		dataLayer.push({
+		  'event': 'productClick',
+		  'ecommerce': {
+		    'detail': {       
+		      'actionField': {'list': list},                  
+		      'products': [{                        
+		        'name': name,
+		        'id': id,
+		        'price': price,
+		        'brand': brand,
+		        'category': category,
+		        'quantity': quantity
+		       }]
+		    }
+		  }
+		});
+	});
+
+	// datalayer que captura cuando se agrega un item al carrito
+	// desde las listas de productos
+	jQuery('.add_to_cart_list').click(function(event) {
+		//event.preventDefault();
+		
+		var id 			= jQuery(this).attr('data-id');
+		var name 		= jQuery(this).attr('data-name');
+		var href 		= jQuery(this).attr('href');
+		var price 		= jQuery(this).attr('data-price');
+		var brand 		= jQuery(this).attr('data-brand');
+		var category 	= jQuery(this).attr('data-category');
+		var list 		= jQuery(this).attr('data-list');
+		var quantity    = jQuery(this).attr('data-quantity');
+		
+		console.log("[add_to_cart_list] id: " + id + " -- name: " + name + " -- price: " + price + " -- href: " + href 
+			                                + " -- brand: " + brand + " -- category: " + category + " -- quantity: " + quantity);
+		dataLayer.push({
+		  'event': 'addToCart',
+		  'ecommerce': {
+		    'currencyCode': 'EUR',
+		    'add': {                                
+		      'products': [{                        
+		        'name': name,
+		        'id': id,
+		        'price': price,
+		        'brand': brand,
+		        'category': category,
+		        'quantity': quantity
+		       }]
+		    }
+		  }
+		});
+
+	});
+
+	// datalayer que captura cuando se agrega un item al carrito
+	// desde la ficha del producto
+	jQuery('.add_to_cart_ficha').click(function(event) {
+		//event.preventDefault();
+		
+		var id 			= jQuery(this).attr('data-id');
+		var name 		= jQuery(this).attr('data-name');
+		var href 		= jQuery(this).attr('href');
+		var price 		= jQuery(this).attr('data-price');
+		var brand 		= jQuery(this).attr('data-brand');
+		var category 	= jQuery(this).attr('data-category');
+		var list 		= jQuery(this).attr('data-list');
+		var quantity    = jQuery("#qty").val();
+		
+		console.log("[add_to_cart_ficha] id: " + id + " -- name: " + name + " -- price: " + price + " -- href: " + href 
+			                                + " -- brand: " + brand + " -- category: " + category + " -- quantity: " + quantity);
+		dataLayer.push({
+		  'event': 'addToCart',
+		  'ecommerce': {
+		    'currencyCode': 'EUR',
+		    'add': {                                
+		      'products': [{                        
+		        'name': name,
+		        'id': id,
+		        'price': price,
+		        'brand': brand,
+		        'category': category,
+		        'quantity': quantity
+		       }]
+		    }
+		  }
+		});
+
+	});
+
+	// datalayer que captura cuando se elimina un item del carrito
+	// desde el popup del carrito
+	jQuery(document).on('click', '.minicart-items .action.delete', function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		
+		var product = jQuery(this).parents('.product-item-details');
+
+		var name = jQuery(product).find('.product-item-name a').html();
+		var id = '';
+		var price = jQuery(product).find('.price').html();
+		var brand = '';
+		var category = '';
+		var quantity = jQuery(product).find('.cart-item-qty').val();
+
+		console.log("[removeFromCart-Popup] id: " + id + " -- name: " + name + " -- price: " + price + 
+			" -- brand: " + brand + " -- category: " + category + " -- quantity: " + quantity);
+
+		/*
+		dataLayer.push({
+		  	'event': 'removeFromCart',
+		  	'ecommerce': {
+			    'currencyCode': 'EUR',
+			    'add': {                                
+			      	'products': [{                        
+			        	'name': name,
+			        	'id': id,
+			        	'price': price,
+			        	'brand': brand,
+			        	'category': category,
+			        	'quantity': quantity
+			       }]
+			    }
+		  	}
+		});
+		*/
+	});
+	
+	// desde la vista del carrito
+	jQuery(document).on('click', '#shopping-cart-table .cart.item .item-actions .action-delete', function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		
+		var product = jQuery(this).parents('.cart.item');
+		var name = jQuery(product).find('.product-item-name a').html();
+		var id = '';
+		var price = jQuery(product).find('.cart-price .price').html();
+		var brand = '';
+		var category = '';
+		var quantity = jQuery(product).find('.input-text.qty').val();
+
+		var base_url = "https://aloepluslanzarote.es/custom/ajax.php";
+		jQuery.ajax({
+		   type: "GET",
+		   data: {type: 'product_by_name', q: name},
+		   url: base_url,
+		   success: function( data ){
+			   
+			   //console.log("[removeFromCart - desde la vista del carrito]" + base_url + "?type=product_by_name&q=" + name);
+			   
+				var obj 	= jQuery.parseJSON( data );
+				id 			= obj.id;
+				category 	= obj.category;
+				
+				console.log("[removeFromCart - desde la vista del carrito] id: " + id + " -- name: " + name + " -- price: " + price + 
+			" -- brand: " + brand + " -- category: " + category + " -- quantity: " + quantity); 
+
+				if( id ){
+					console.log("[removeFromCart - desde la vista del carrito] dataLayer.push");
+					dataLayer.push({
+						'event': 'removeFromCart',
+						'ecommerce': {
+							'currencyCode': 'EUR',
+							'add': {                                
+								'products': [{                        
+									'name': name,
+									'id': id,
+									'price': price,
+									'brand': brand,
+									'category': category,
+									'quantity': quantity
+							   }]
+							}
+						}
+					});
+				}
+		   },
+		   beforeSend: function(){}
+		});
+	});
+});
